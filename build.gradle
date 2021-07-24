@@ -124,7 +124,7 @@ tasks.stage.doLast() {
 war.mustRunAfter clean
 
 task copyToLib(type: Copy) {
-    into "$buildDir/server"
+    into "$buildDir/libs"
     from(configurations.compile) {
         include "webapp-runner*"
     }
