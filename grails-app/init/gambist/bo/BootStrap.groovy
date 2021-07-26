@@ -79,7 +79,8 @@ class BootStrap {
                     username: firstname[it],
                     dayOfBirth: randomDayOfBirth(),
                     firstname: firstname[it],
-                    lastname: lastname[it]
+                    lastname: lastname[it],
+                    bankBalance: 50
             ).save())
         }
         return users

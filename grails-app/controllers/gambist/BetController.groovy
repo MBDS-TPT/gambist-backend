@@ -1,5 +1,6 @@
 package gambist
 
+import gambist.model.ResponseBody
 import grails.converters.JSON
 import grails.validation.ValidationException
 import utils.DateUtil
@@ -64,6 +65,7 @@ class BetController {
         def date = DateUtil.toDate(request.JSON.betDate)
         def match = matchService.get(request.JSON.matchId)
         def user = userService.get(request.JSON.userId)
+        def responseBody = new ResponseBody(status: HttpServletResponse.SC_OK, result: "OK")
         Team team = null
         if(request.JSON.teamId) {
             team = teamService.get(request.JSON.teamId)
@@ -73,6 +75,18 @@ class BetController {
         if(!request.JSON.betValue || !request.JSON.betDate ||
                 !request.JSON.odds || !match || !date || !user)
             return HttpServletResponse.SC_BAD_REQUEST
+        println(user.bankBalance +"<"+ request.JSON.betValue)
+        if(user.bankBalance < request.JSON.betValue) {
+            responseBody.status = HttpServletResponse.SC_BAD_REQUEST
+            responseBody.result = "KO"
+            responseBody.message = "Your balance is insufficient."
+            JSON.use(('deep'))  {
+                render responseBody as JSON
+            }
+        } else {
+            user.bankBalance = user.bankBalance-request.JSON.betValue
+            userService.save(user)
+        }
         def bet = new Bet(
                 match: match,
                 user: user,
@@ -82,8 +96,9 @@ class BetController {
                 odds: request.JSON.odds
         )
         bet = betService.save(bet)
+        responseBody.data = bet
         JSON.use(('deep'))  {
-            render bet as JSON
+            render responseBody as JSON
         }
     }
 
