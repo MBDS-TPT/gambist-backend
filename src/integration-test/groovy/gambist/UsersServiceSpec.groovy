@@ -7,7 +7,7 @@ import org.hibernate.SessionFactory
 
 @Integration
 @Rollback
-class UserServiceSpec extends Specification {
+class UsersServiceSpec extends Specification {
 
     UserService userService
     SessionFactory sessionFactory
@@ -34,7 +34,7 @@ class UserServiceSpec extends Specification {
         setupData()
 
         when:
-        List<User> userList = userService.list(max: 2, offset: 2)
+        List<Users> userList = userService.list(max: 2, offset: 2)
 
         then:
         userList.size() == 2
@@ -65,7 +65,7 @@ class UserServiceSpec extends Specification {
     void "test save"() {
         when:
         assert false, "TODO: Provide a valid instance to save"
-        User user = new User()
+        Users user = new Users()
         userService.save(user)
 
         then:

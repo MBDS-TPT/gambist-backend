@@ -1,30 +1,33 @@
 package gambist.bo
 
 import gambist.Bet
+import gambist.BetService
 import gambist.BetType
 import gambist.Category
+import gambist.CategoryService
 import gambist.Match
+import gambist.MatchService
 import gambist.Team
-import gambist.User
-import grails.converters.JSON
+import gambist.TeamService
+import gambist.UserService
+import gambist.Users
 
-import java.sql.Time
 import java.sql.Timestamp
 
 class BootStrap {
+
+    CategoryService categoryService
+    UserService userService
+    MatchService matchService
+    BetService betService
+    TeamService teamService
 
     def init = { servletContext ->
 //        JSON.registerObjectMarshaller(Date) {
 //            return it?.format("dd.MM.yyyy")
 //        }
         def users = createUsers()
-        def categoryName = ["Football", "Basketball", "Volleyball", "Rugby"]
-        def categories = []
-        categoryName.each {
-            categories.add(new Category(
-                    label: it
-            ).save())
-        }
+        def categories = createCategories()
         def footballTeams = createFootballTeam(categories[0])
         def footballMatches = createMatches(footballTeams, categories[0], 10, 6)
         def bets = createBets(footballMatches, users)
@@ -37,11 +40,25 @@ class BootStrap {
         def rugbyTeams = createRugbyTeam(categories[3])
         def rugbyMatches = createMatches(rugbyTeams, categories[3], 15, 7, 50)
         def rugbyBets = createBets(rugbyMatches, users)
-
         footballMatches.addAll(createMatches(footballTeams, categories[0], 10, 6))
     }
 
-    private List<Bet> createBets(List<Match> matches, List<User> users) {
+    private List<Category> createCategories() {
+        println("Create categories")
+        if(categoryService.count() > 0) return categoryService.list()
+        def categoryName = ["Football", "Basketball", "Volleyball", "Rugby"]
+        def categories = []
+        categoryName.each {
+            categories.add(categoryService.save(new Category(
+                    label: it
+            )))
+        }
+        return categories
+    }
+
+    private List<Bet> createBets(List<Match> matches, List<Users> users) {
+        println("Create bets")
+        if(betService.count() > 0) return betService.list()
         def bets = []
         matches.each { m ->
             Set<Integer> index = []
@@ -55,7 +72,7 @@ class BootStrap {
                 def teamOdds = rand % 3 == 0 ? m.oddsA : rand % 5 == 0 ? m.oddsNul : m.oddsB
 //                println(teamOdds + " - " + m.oddsA + ','+m.oddsNul+','+m.oddsB)
                 def date = new java.sql.Date(System.currentTimeMillis() + (j * randBetween(0, 2)))
-                bets.add(new Bet(
+                bets.add(betService.save(new Bet(
                         user: users[userIndex],
                         match: m,
                         betDate: date,
@@ -63,17 +80,19 @@ class BootStrap {
                         betValue: randBetween(2, 20) * 10,
                         team: selectedTeam,
                         odds: teamOdds
-                ).save())
+                )))
             }
         }
     }
 
-    private List<User> createUsers() {
+    private List<Users> createUsers() {
+        println("Create user ")
+        if(Users.count() > 0) return Users.findAll()
         def firstname = ["Johnatan", "Michael", "Andy", "Jean", "Hillary","Marena","Vinita","Tessy","Florenza","Nicky","Mella","Alissa","Giordano","Kakalina","Rhianon","Bobette","Willabella","Aime","Adrea","Christean","Gaylord","Kiah","Nalani","Honoria","Willis","Aeriell"]
-        def lastname = ["Manandraibe", "Ramaroson", "Randrianirina", "Ianiello","Date","Mulvagh","Ceschini","Tolchar","Kerr","Goble","Kuhle","Macguire","Masding","Croose","Broker","Phillimore","Sawl","Dearl","Cowderoy","Broderick","Ubach","Crossley","Yoakley","Gorthy","Braisted"]
+        def lastname = ["Manandraibe", "Ramaroson", "Randrianirina", "Ianiello","Date","Mulvagh","Ceschini","Tolchar","Kerr","Goble","Kuhle","Macguire","Masding","Croose","Broker","Phillimore","Sawl","Dearl","Cowderoy","Broderick","Ubach","Crossley","Yoakley","Gorthy","Braisted", "Bell"]
         def users = []
         firstname.size().times {
-            users.add(new User(
+            def user = userService.save(new Users(
                     email: "${firstname[it].toLowerCase()}@gmail.com",
                     password: 'password',
                     username: firstname[it],
@@ -81,7 +100,8 @@ class BootStrap {
                     firstname: firstname[it],
                     lastname: lastname[it],
                     bankBalance: 50
-            ).save())
+            ))
+            users.add(user)
         }
         return users
     }
@@ -110,6 +130,11 @@ class BootStrap {
     }
 
     private List<Team> createFootballTeam(Category footballCategory) {
+        println("Create football teams")
+        def footballTeams = []
+        footballTeams = Team.findAllByCategory(footballCategory)
+        if(!footballTeams.isEmpty()) return footballTeams
+        footballTeams = []
         def footballTeams_ = [
                 "Borussia Dortmound":"https://www.pngitem.com/pimgs/m/35-350698_transparent-bvb-logo-png-borussia-dortmund-logo-png.png",
                 "Chelsea":"https://i.pinimg.com/736x/b9/22/c4/b922c4e18a85eeb707bf73423033442b.jpg",
@@ -126,19 +151,23 @@ class BootStrap {
                 "Ajax Amsterdam":"https://upload.wikimedia.org/wikipedia/fr/7/77/Ajax_Amsterdam_Logo.svg",
                 "Tottenham":"https://kgo.googleusercontent.com/profile_vrt_raw_bytes_1587515401_10891.jpg"
         ]
-        def footballTeams = []
         def keys = footballTeams_.keySet()
         keys.each {
-            footballTeams.add(new Team(
+            footballTeams.add(teamService.save(new Team(
                     name: it,
                     category: footballCategory,
                     logo: footballTeams_[it]
-            ).save())
+            )))
         }
         return footballTeams
     }
 
     private List<Team> createBasketballTeam(Category category) {
+        println("Create basketball team")
+        def basketBallTeams = []
+        basketBallTeams = Team.findAllByCategory(category)
+        if(!basketBallTeams.isEmpty()) return basketBallTeams
+        basketBallTeams = []
         def basketBallTeams_ = [
                 "USA Basketball":"https://upload.wikimedia.org/wikipedia/commons/6/6d/USA_Basketball_logo.svg",
                 "Celtics de Boston":"https://upload.wikimedia.org/wikipedia/fr/thumb/6/65/Celtics_de_Boston_logo.svg/1200px-Celtics_de_Boston_logo.svg.png",
@@ -158,19 +187,23 @@ class BootStrap {
                 "Trail Blazers de Portland":"https://upload.wikimedia.org/wikipedia/fr/thumb/6/68/Trail_Blazers_de_Portland_2017.png/200px-Trail_Blazers_de_Portland_2017.png",
                 "Spurs de San Antonio":"https://upload.wikimedia.org/wikipedia/fr/0/0e/San_Antonio_Spurs_2018.png"
         ]
-        def basketBallTeams = []
         def keys = basketBallTeams_.keySet()
         keys.each {
-            basketBallTeams.add(new Team(
+            basketBallTeams.add(teamService.save(new Team(
                     name: it,
                     category: category,
                     logo: basketBallTeams_[it]
-            ).save())
+            )))
         }
         return basketBallTeams
     }
 
     private List<Team> createVolleyBallTeam(Category category) {
+        println("Create volleyball team")
+        def team = []
+//        team = Team.findAllByCategory(category)
+//        if(!team.isEmpty()) return team
+//        team = []
         def teams_ = [
                 "Équipe du Japon de volley-ball":"https://c0.lestechnophiles.com/www.numerama.com/wp-content/uploads/2017/04/japan_volleyball_tournament.jpeg?resize=1212,712",
                 "Équipe du Canada de volley-ball":"https://volleyball.ca/assets/images/share_facebook.jpg",
@@ -185,19 +218,23 @@ class BootStrap {
                 "Équipe d'Ukraine de volley-ball":"https://www.fivb.org/Vis2009/Images/GetImage.asmx?No=201724917&width=1500&height=865&stretch=uniform",
                 "Équipe de Grande‑Bretagne":"https://upload.wikimedia.org/wikipedia/en/thumb/4/43/Britishvolleyball_logo.png/180px-Britishvolleyball_logo.png"
         ]
-        def team = []
         def keys = teams_.keySet()
         keys.each {
-            team.add(new Team(
+            team.add(teamService.save(new Team(
                     name: it,
                     category: category,
                     logo: teams_[it]
-            ).save())
+            )))
         }
         return team
     }
 
     private List<Team> createRugbyTeam(Category category) {
+        println("Create rugby team")
+        def team = []
+        team = Team.findAllByCategory(category)
+        if(!team.isEmpty()) return team
+        team = []
         def teams_ = [
             "Équipe des Lions britanniques": "https://upload.wikimedia.org/wikipedia/fr/7/73/Logo_Lions_britanniques_et_irlandais.png",
             "Équipe d'Angleterre": "https://upload.wikimedia.org/wikipedia/fr/thumb/c/cf/Logo_Rugby_Angleterre.svg/1200px-Logo_Rugby_Angleterre.svg.png",
@@ -216,21 +253,24 @@ class BootStrap {
             "Équipe du Japon": "https://upload.wikimedia.org/wikipedia/fr/thumb/3/37/Logo_JRFU.svg/1200px-Logo_JRFU.svg.png",
             "Équipe de Hong Kong": "https://upload.wikimedia.org/wikipedia/en/6/69/Hong_Kong_national_rugby_union_team_logo.png"
         ]
-        def team = []
         def keys = teams_.keySet()
         keys.each {
-            team.add(new Team(
+            team.add(teamService.save(new Team(
                     name: it,
                     category: category,
                     logo: teams_[it]
-            ).save())
+            )))
         }
         return team
     }
 
     private List<Match> createMatches(List<Team> teams, Category category, int outdatedCount, int upcomingCount, maxScore=5) {
-        def random = new Random()
+        println("Create match")
         def matches = []
+        matches = Match.findAllByCategory(category)
+        if(!matches.isEmpty()) return matches
+        matches = []
+        def random = new Random()
         def previousIndex = 0 // Pour ne pas avoir les memes equipes dans 2 match consecutif
         outdatedCount.times {
             def indexList = createArrayIndex(teams.size())
@@ -243,7 +283,7 @@ class BootStrap {
             double oddsNul = Math.abs(oddsB-oddsA)+1
             long time = new Date().getTime() - 72000000/2 * it
             int scoreA = random.nextInt(maxScore)
-            matches.add(new Match(
+            matches.add(matchService.save(new Match(
                     teamA: teams[indexA],
                     teamB: teams[indexB],
                     category: category,
@@ -253,9 +293,10 @@ class BootStrap {
                     scoreB: maxScore-scoreA,
                     oddsNul: oddsNul,
                     matchDate: new Timestamp(time)
-            ).save())
+            )))
         }
         previousIndex = 0
+        def i = 0;
         upcomingCount.times {
             def indexList = createArrayIndex(teams.size())
             int indexA = indexList.remove(random.nextInt(indexList.size()))
@@ -265,8 +306,8 @@ class BootStrap {
             double oddsB = random.nextDouble() + random.nextInt(oddsA >= 4 ? 2 : 5)
             oddsB = oddsB < 1 ? oddsB + 1 : oddsB
             double oddsNul = Math.abs(oddsB-oddsA)+1
-            long time = new Date().getTime() + 7200000 * it
-            matches.add(new Match(
+            long time = new Date().getTime() + 7200000 * (i++ < 2 ? 1 : it)
+            matches.add(matchService.save(new Match(
                     teamA: teams[indexA],
                     teamB: teams[indexB],
                     category: category,
@@ -274,7 +315,7 @@ class BootStrap {
                     oddsB: oddsB,
                     oddsNul: oddsNul,
                     matchDate: new Timestamp(time)
-            ).save())
+            )))
         }
         return matches
     }

@@ -75,7 +75,6 @@ class BetController {
         if(!request.JSON.betValue || !request.JSON.betDate ||
                 !request.JSON.odds || !match || !date || !user)
             return HttpServletResponse.SC_BAD_REQUEST
-        println(user.bankBalance +"<"+ request.JSON.betValue)
         if(user.bankBalance < request.JSON.betValue) {
             responseBody.status = HttpServletResponse.SC_BAD_REQUEST
             responseBody.result = "KO"

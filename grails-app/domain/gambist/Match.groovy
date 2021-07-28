@@ -23,4 +23,8 @@ class Match {
         oddsB default: 2
         oddsNul default: 2
     }
+
+    static mapping = {
+        id(generator: "increment")
+    }
 }

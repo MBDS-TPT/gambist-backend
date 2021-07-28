@@ -1,6 +1,6 @@
 package gambist
 
-class User {
+class Users {
 
     String email
     String firstname
@@ -15,5 +15,9 @@ class User {
     static constraints = {
         state default: 0
         bankBalance default: 0
+    }
+
+    static mapping = {
+        id(generator: "increment")
     }
 }
