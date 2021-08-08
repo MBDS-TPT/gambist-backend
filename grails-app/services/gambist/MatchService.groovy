@@ -99,7 +99,11 @@ abstract class MatchService {
             if((bet.teamId == match.teamAId && teamAWin) || (!bet.teamId && draw)) {
                 user.bankBalance += bet.betValue * bet.odds
                 user.save()
+                bet.state = State.BET_WON;
+            } else {
+                bet.state = State.LOST_BET;
             }
+            bet.save()
         }
     }
 
