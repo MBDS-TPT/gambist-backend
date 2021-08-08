@@ -8,6 +8,7 @@ class Users {
     String lastname
     String username
     Date dayOfBirth
+    boolean isAdmin
     double bankBalance
     static hasMany = [bets: Bet]
     int state
@@ -15,6 +16,7 @@ class Users {
     static constraints = {
         state default: 0
         bankBalance default: 0
+        isAdmin default: false
     }
 
     static mapping = {

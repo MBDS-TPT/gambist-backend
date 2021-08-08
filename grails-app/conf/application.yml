@@ -104,7 +104,8 @@ dataSource:
     jmxExport: true
     url: jdbc:oracle:thin:@144.21.67.201:1521/PDBITU.631174089.oraclecloud.internal
     driverClassName: oracle.jdbc.driver.OracleDriver
-    dialect: org.hibernate.dialect.Oracle10gDialect
+#    dialect: org.hibernate.dialect.Oracle10gDialect
+
 #    driverClassName: org.h2.Driver
 #    username: sa
     username: ManandraibeMI2021
@@ -115,11 +116,11 @@ dataSource:
 environments:
     development:
         dataSource:
-            dbCreate: none
-#            username: sa
-#            password: ''
-#            driverClassName: org.h2.Driver
-#            url: jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
+            dbCreate: create-drop
+            username: sa
+            password: ''
+            driverClassName: org.h2.Driver
+            url: jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
     test:
         dataSource:
             dbCreate: update

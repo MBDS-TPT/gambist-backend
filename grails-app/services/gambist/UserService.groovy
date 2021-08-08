@@ -11,8 +11,8 @@ abstract class UserService {
         return Users.findAllByState(State.CREATED)
     }
 
-    Users login(login, password) {
-        return Users.findByEmailAndPassword(login, password)
+    Users login(login, password, isAdmin) {
+        return Users.findByEmailAndPasswordAndIsAdmin(login, password, isAdmin)
     }
 
     abstract Long count()
