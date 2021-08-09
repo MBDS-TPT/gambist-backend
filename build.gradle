@@ -34,6 +34,7 @@ configurations {
 
 dependencies {
     developmentOnly("org.springframework.boot:spring-boot-devtools")
+    compile "com.github.jsimone:webapp-runner:8.5.11.3"
     compile "org.springframework.boot:spring-boot-starter-logging"
     compile "org.springframework.boot:spring-boot-autoconfigure"
     compile "org.grails:grails-core"
@@ -108,9 +109,9 @@ assets {
     minifyCss = true
 }
 
-// task wrapper(type: Wrapper) {
-//     gradleVersion = gradleWrapperVersion
-// }
+task wrapper(type: Wrapper) {
+    gradleVersion = gradleWrapperVersion
+}
 
 task stage() {
     dependsOn clean, war
@@ -124,7 +125,7 @@ tasks.stage.doLast() {
 war.mustRunAfter clean
 
 task copyToLib(type: Copy) {
-    into "$buildDir/libs"
+    into "$buildDir/server"
     from(configurations.compile) {
         include "webapp-runner*"
     }
