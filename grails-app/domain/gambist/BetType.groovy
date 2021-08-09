@@ -13,4 +13,8 @@ class BetType {
         currentWinningRate default: 200
         description blank: true
     }
+
+    static mapping = {
+        id(generator: "increment")
+    }
 }

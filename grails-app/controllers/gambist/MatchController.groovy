@@ -1,5 +1,6 @@
 package gambist
 
+import gambist.model.ResponseBody
 import utils.DateUtil
 
 import javax.servlet.http.HttpServletResponse
@@ -25,6 +26,18 @@ class MatchController {
             }
         }
         return response.status = HttpServletResponse.SC_NOT_FOUND
+    }
+
+    def endMatch() {
+        if(!request.JSON.matchId) return HttpServletResponse.SC_BAD_REQUEST
+        long matchId = Long.parseLong(request.JSON.matchId)
+        matchService.endMatch(matchId)
+        def responseBody = new ResponseBody(
+                status: HttpServletResponse.SC_OK,
+                message: "Match closed",
+                result: "OK"
+        )
+        render responseBody as JSON
     }
 
     def all() {

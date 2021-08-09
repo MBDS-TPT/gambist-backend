@@ -2,23 +2,23 @@ package gambist
 
 import grails.gorm.services.Service
 
-@Service(User)
+@Service(Users)
 abstract class UserService {
 
-    abstract User get(Serializable id)
+    abstract Users get(Serializable id)
 
-    List<User> list(Map args) {
-        return User.findAllByState(State.CREATED)
+    List<Users> list(Map args) {
+        return Users.findAllByState(State.CREATED)
     }
 
-    User login(login, password) {
-        return User.findByEmailAndPassword(login, password)
+    Users login(login, password, isAdmin) {
+        return Users.findByEmailAndPasswordAndIsAdmin(login, password, isAdmin)
     }
 
     abstract Long count()
 
     abstract void delete(Serializable id)
 
-    abstract User save(User user)
+    abstract Users save(Users user)
 
 }

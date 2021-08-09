@@ -9,7 +9,7 @@ class Bet {
     Match match
     double odds
     Team team
-    static belongsTo = [user: User]
+    static belongsTo = [user: Users]
     int state
 
     static constraints = {
@@ -18,5 +18,8 @@ class Bet {
         betType nullable: true
         team nullable: true
         odds default: 1
+    }
+    static mapping = {
+        id(generator: "increment")
     }
 }

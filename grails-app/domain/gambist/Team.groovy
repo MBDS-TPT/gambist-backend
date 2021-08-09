@@ -12,4 +12,8 @@ class Team {
         logo nullable: true, size: 0..500
     }
 
+    static mapping = {
+        id(generator: "increment")
+    }
+
 }

@@ -1,12 +1,9 @@
 package gambist
 
 import grails.converters.JSON
-import grails.validation.ValidationException
 import utils.DateUtil
 
 import javax.servlet.http.HttpServletResponse
-
-import static org.springframework.http.HttpStatus.*
 
 class UserController {
 
@@ -28,7 +25,7 @@ class UserController {
                 || !request.JSON.email
                 || !request.JSON.firstname)
             return response.status = HttpServletResponse.SC_BAD_REQUEST
-        def user = new User()
+        def user = new Users()
         user.firstname = request.JSON.firstname
         user.lastname = request.JSON.lastname
         user.dayOfBirth = DateUtil.toDate(request.JSON.dayOfBirth)

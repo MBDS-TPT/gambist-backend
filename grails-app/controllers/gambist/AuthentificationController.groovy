@@ -13,9 +13,11 @@ class AuthentificationController {
     def login() {
         def login = request.JSON.username
         def password = request.JSON.password
+        def isAdmin = request.JSON.isAdmin
+        if(!isAdmin) isAdmin = false
         if(!login || !password)
             return response.status = HttpServletResponse.SC_BAD_REQUEST
-        def user = userService.login(login, password)
+        def user = userService.login(login, password, isAdmin)
         def body = new ResponseBody()
         if(user) {
             user.password = '???'

@@ -8,4 +8,8 @@ class Category {
     static constraints = {
         state default: 0
     }
+
+    static mapping = {
+        id(generator: "increment")
+    }
 }
