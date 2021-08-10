@@ -1,5 +1,6 @@
 package gambist
 
+import gambist.model.ResponseBody
 import grails.converters.JSON
 import utils.DateUtil
 
@@ -58,6 +59,44 @@ class UserController {
         userService.save(user)
         JSON.use("deep") {
             render user as JSON
+        }
+    }
+
+    def changePassword() {
+        if(!request.JSON.id || !request.JSON.password || !request.JSON.newPassword)
+            return response.status = HttpServletResponse.SC_BAD_REQUEST
+        Users u = userService.changePassword(Long.parseLong(request.JSON.id+""), request.JSON.password, request.JSON.newPassword)
+        ResponseBody body = new ResponseBody()
+        body.message = 'Success'
+        body.result = "OK"
+        body.status = HttpServletResponse.SC_OK
+        if(u) {
+            body.data = u
+        } else {
+            body.status = HttpServletResponse.SC_NOT_FOUND
+            body.message = "Wrong password!"
+            body.result = "KO"
+        }
+        JSON.use('deep') {
+            render body as JSON
+        }
+    }
+
+    def editProfile() {
+        if(!request.JSON.id || !request.JSON.firstname || !request.JSON.lastname)
+            return response.status = HttpServletResponse.SC_BAD_REQUEST
+        Users u = userService.editProfil(Long.parseLong(request.JSON.id+""), request.JSON.firstname, request.JSON.lastname)
+        ResponseBody body = new ResponseBody()
+        if(u) {
+            body.data = u
+            body.message = 'Success'
+            body.status = HttpServletResponse.SC_OK
+        } else {
+            body.status = HttpServletResponse.SC_NOT_FOUND
+            body.message = "Wrong password!"
+        }
+        JSON.use('deep') {
+            render body as JSON
         }
     }
 
