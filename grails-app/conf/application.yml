@@ -102,8 +102,8 @@ hibernate:
 dataSource:
     pooled: true
     jmxExport: true
-    url: jdbc:oracle:thin:@144.21.67.201:1521/PDBITU.631174089.oraclecloud.internal
-    driverClassName: oracle.jdbc.driver.OracleDriver
+#    url: jdbc:oracle:thin:@144.21.67.201:1521/PDBITU.631174089.oraclecloud.internal
+#    driverClassName: oracle.jdbc.driver.OracleDriver
 #    dialect: org.hibernate.dialect.Oracle10gDialect
 
 #    driverClassName: org.h2.Driver
