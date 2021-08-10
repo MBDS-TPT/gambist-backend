@@ -12,7 +12,7 @@ abstract class UserService {
     }
 
     Users login(login, password, isAdmin) {
-        return Users.findByEmailAndPasswordAndIsAdmin(login, password, isAdmin)
+        return Users.findByEmailAndPasswordAndIsAdmin(login, password.sha256(), isAdmin)
     }
 
     abstract Long count()

@@ -94,7 +94,7 @@ class BootStrap {
         firstname.size().times {
             def user = userService.save(new Users(
                     email: "${firstname[it].toLowerCase()}@gmail.com",
-                    password: 'password',
+                    password: 'password'.sha256(),
                     username: firstname[it],
                     dayOfBirth: randomDayOfBirth(),
                     firstname: firstname[it],

@@ -31,7 +31,7 @@ class UserController {
         user.dayOfBirth = DateUtil.toDate(request.JSON.dayOfBirth)
         user.email = request.JSON.email
         user.username = request.JSON.username
-        user.password = request.JSON.password
+        user.password = request.JSON.password.sha256()
         userService.save(user)
         JSON.use("deep") {
             render user as JSON
