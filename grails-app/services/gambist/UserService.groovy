@@ -36,6 +36,16 @@ abstract class UserService {
         return u
     }
 
+
+    Users updateSolde(userId, password, montant) {
+        Users u = Users.findByIdAndPassword(userId, password.sha256())
+        if(u) {
+            u.bankBalance += montant
+            u = u.save(flush: true)
+        }
+        return u
+    }
+
     abstract Long count()
 
     abstract void delete(Serializable id)

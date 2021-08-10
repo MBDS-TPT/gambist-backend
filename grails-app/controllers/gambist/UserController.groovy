@@ -82,6 +82,24 @@ class UserController {
         }
     }
 
+    def creditAccount() {
+        if(!request.JSON.id || !request.JSON.password || !request.JSON.montant)
+            return response.status = HttpServletResponse.SC_BAD_REQUEST
+        Users u = userService.updateSolde(Long.parseLong(request.JSON.id+""), request.JSON.password, Double.parseDouble(request.JSON.montant))
+        ResponseBody body = new ResponseBody()
+        if(u) {
+            body.data = u
+            body.message = 'Success'
+            body.status = HttpServletResponse.SC_OK
+        } else {
+            body.status = HttpServletResponse.SC_NOT_FOUND
+            body.message = "Wrong password!"
+        }
+        JSON.use('deep') {
+            render body as JSON
+        }
+    }
+
     def editProfile() {
         if(!request.JSON.id || !request.JSON.firstname || !request.JSON.lastname)
             return response.status = HttpServletResponse.SC_BAD_REQUEST
