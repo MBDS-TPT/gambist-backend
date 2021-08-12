@@ -85,22 +85,34 @@ class BetController {
         } else {
             user.bankBalance = user.bankBalance-request.JSON.betValue
             userService.save(user)
+            def bet = new Bet(
+                    match: match,
+                    user: user,
+                    betValue: request.JSON.betValue,
+                    betDate: date,
+                    team: team,
+                    odds: request.JSON.odds
+            )
+            bet = betService.save(bet)
+            responseBody.data = bet
+            JSON.use(('deep'))  {
+                render responseBody as JSON
+            }
         }
-        def bet = new Bet(
-                match: match,
-                user: user,
-                betValue: request.JSON.betValue,
-                betDate: date,
-                team: team,
-                odds: request.JSON.odds
-        )
-        bet = betService.save(bet)
-        responseBody.data = bet
-        JSON.use(('deep'))  {
-            render responseBody as JSON
-        }
+
     }
 
+    def getUserBetStatistics() {
+        if(!params.userid) response.status = HttpServletResponse.SC_BAD_REQUEST
+        def map = [:]
+        map.won = betService.countUserBetByState(params.userid, State.BET_WON);
+        map.lost = betService.countUserBetByState(params.userid, State.LOST_BET);
+        def body = new ResponseBody()
+        body.status = HttpServletResponse.SC_OK
+        body.result = "OK"
+        body.data = map
+        render body as JSON
+    }
 
 //    def index(Integer max) {
 //        params.max = Math.min(max ?: 10, 100)

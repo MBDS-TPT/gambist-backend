@@ -13,6 +13,10 @@ abstract class UserService {
         return Users.findAllByState(State.CREATED)
     }
 
+    Users getUserById(userid) {
+        return Users.findById(userid)
+    }
+
     Users login(login, password, isAdmin) {
         return Users.findByEmailAndPasswordAndIsAdmin(login, password.sha256(), isAdmin)
     }

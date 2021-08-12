@@ -82,6 +82,9 @@ class BootStrap {
                         odds: teamOdds
                 )))
             }
+            def twoHour = 7200000
+            if((new Date().time-m.matchDate.time) >= twoHour)
+                matchService.endMatch(m.id)
         }
     }
 

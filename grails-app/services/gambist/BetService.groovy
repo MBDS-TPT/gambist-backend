@@ -36,6 +36,11 @@ abstract class BetService {
         return res
     }
 
+    int countUserBetByState(userid, state) {
+        Users u = Users.findById(userid)
+        return Bet.countByUserAndState(u, state)
+    }
+
     abstract List<Bet> list(Map args)
 
     abstract Long count()

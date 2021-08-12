@@ -93,10 +93,12 @@ abstract class MatchService {
         match.state = State.MATCH_ENDED
         def bets = Bet.findAllByMatch(match)
         def teamAWin = match.scoreA > match.scoreB
+        def teamBWin = match.scoreA < match.scoreB
         def draw = match.scoreA == match.scoreB
         bets.forEach { bet ->
             Users user = bet.user
-            if((bet.teamId == match.teamAId && teamAWin) || (!bet.teamId && draw)) {
+            if((bet.teamId == match.teamAId && teamAWin) ||
+                    (bet.teamId == match.teamBId && teamBWin) || (!bet.teamId && draw)) {
                 user.bankBalance += bet.betValue * bet.odds
                 user.save()
                 bet.state = State.BET_WON;
