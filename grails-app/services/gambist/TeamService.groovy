@@ -10,7 +10,7 @@ abstract class TeamService {
 //    abstract List<Team> list(Map args)
 
     Object list(Map args) {
-        def max = args && args.max ? Integer.parseInt(args.max) : 10
+        def max = args && args.max ? Integer.parseInt(args.max) : 50
         def offset = args && args.page ? Integer.parseInt(args.page) * max : 0
         def criteria = Team.createCriteria()
         def res =  criteria.list(max: max, offset: offset) {

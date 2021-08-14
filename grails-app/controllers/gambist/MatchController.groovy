@@ -30,7 +30,7 @@ class MatchController {
 
     def endMatch() {
         if(!request.JSON.matchId) return HttpServletResponse.SC_BAD_REQUEST
-        long matchId = Long.parseLong(request.JSON.matchId)
+        long matchId = Long.parseLong(request.JSON.matchId+"")
         matchService.endMatch(matchId)
         def responseBody = new ResponseBody(
                 status: HttpServletResponse.SC_OK,
@@ -102,16 +102,36 @@ class MatchController {
         if(!request.getMethod().equalsIgnoreCase("POST"))
             return HttpServletResponse.SC_METHOD_NOT_ALLOWED
         def date = new Timestamp(DateUtil.toDate(request.JSON.matchDate).getTime())
-        if(!request.JSON.teamAId || !request.JSON.teamBId || !request.JSON.categoryId || !date)
+        if(!request.JSON.teamAId ||
+                !request.JSON.teamBId ||
+                !request.JSON.categoryId || !date ||
+                !request.JSON.oddsA || !request.JSON.oddsB)
             return HttpServletResponse.SC_BAD_REQUEST
         def match = new Match(
                 category: categoryService.get(request.JSON.categoryId),
                 teamA: teamService.get(request.JSON.teamAId),
                 teamB: teamService.get(request.JSON.teamBId),
+                oddsA: request.JSON.oddsA,
+                oddsB: request.JSON.oddsB,
+                oddsNul: request.JSON.oddsNul,
                 matchDate: date
         )
         match = matchService.save(match)
         JSON.use(('deep'))  {
+            render match as JSON
+        }
+    }
+
+    def getTodaysMatch() {
+        def match = matchService.getTodaysMatch()
+        JSON.use('deep') {
+            render match as JSON
+        }
+    }
+
+    def getOnGoingMatch() {
+        def match = matchService.getOnGoingMatch()
+        JSON.use('deep') {
             render match as JSON
         }
     }

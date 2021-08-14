@@ -1,8 +1,10 @@
 package gambist
 
 import grails.gorm.services.Service
+import grails.gorm.transactions.Transactional
 
 @Service(Match)
+@Transactional
 abstract class MatchService {
 
     abstract Match get(Serializable id)
@@ -57,10 +59,42 @@ abstract class MatchService {
     List<Match> getLatestMatchResult(int count) {
         def criteria = Match.createCriteria()
         return criteria.list(max: count) {
-            eq('state', State.CREATED)
+            eq('state', State.MATCH_ENDED)
             lt('matchDate', new Date())
             order('matchDate', 'desc')
         }
+    }
+
+    List<Match> getTodaysMatch() {
+        def criteria = Match.createCriteria()
+        def calendar = GregorianCalendar.getInstance()
+        calendar.setTime(new Date())
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+        def date1 = calendar.getTime()
+        calendar.set(Calendar.HOUR_OF_DAY, 23)
+        calendar.set(Calendar.MINUTE, 59)
+        calendar.set(Calendar.SECOND, 59)
+        def date2 = calendar.getTime()
+        return criteria.list() {
+            eq('state', State.CREATED)
+            gte('matchDate', date1)
+            lte('matchDate', date2)
+        }
+    }
+
+    List<Match> getOnGoingMatch() {
+        def match = getTodaysMatch()
+        def reps = []
+        match.forEach(){
+            def d1 = it.matchDate.time
+            def d2 = new Date().time
+            if(d2 > d1)
+                reps.add(it)
+        }
+        return reps
     }
 
     List<Match> getPopularMatches(int count) {
@@ -88,7 +122,7 @@ abstract class MatchService {
         return data
     }
 
-    void endMatch(long id) {
+    Match endMatch(long id) {
         def match = Match.findById(id)
         match.state = State.MATCH_ENDED
         def bets = Bet.findAllByMatch(match)
@@ -100,14 +134,15 @@ abstract class MatchService {
             if((bet.teamId == match.teamAId && teamAWin) ||
                     (bet.teamId == match.teamBId && teamBWin) || (!bet.teamId && draw)) {
                 user.bankBalance += bet.betValue * bet.odds
-                user.save()
-                bet.state = State.BET_WON;
+                user.save(flush: true)
+                bet.state = State.BET_WON
             } else {
-                bet.state = State.LOST_BET;
+                bet.state = State.LOST_BET
             }
-            bet.save()
+            bet.save(flush: true)
         }
-    }
+        return match.save(flush: true)
+    } 
 
     abstract Long count()
 
