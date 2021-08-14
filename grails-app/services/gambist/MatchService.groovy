@@ -129,6 +129,7 @@ abstract class MatchService {
         def teamAWin = match.scoreA > match.scoreB
         def teamBWin = match.scoreA < match.scoreB
         def draw = match.scoreA == match.scoreB
+        match.save(flush: true)
         bets.forEach { bet ->
             Users user = bet.user
             if((bet.teamId == match.teamAId && teamAWin) ||
@@ -141,8 +142,8 @@ abstract class MatchService {
             }
             bet.save(flush: true)
         }
-        return match.save(flush: true)
-    } 
+        return match 
+    }
 
     abstract Long count()
 

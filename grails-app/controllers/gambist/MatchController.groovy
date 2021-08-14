@@ -31,11 +31,12 @@ class MatchController {
     def endMatch() {
         if(!request.JSON.matchId) return HttpServletResponse.SC_BAD_REQUEST
         long matchId = Long.parseLong(request.JSON.matchId+"")
-        matchService.endMatch(matchId)
+        def match = matchService.endMatch(matchId)
         def responseBody = new ResponseBody(
                 status: HttpServletResponse.SC_OK,
                 message: "Match closed",
-                result: "OK"
+                result: "OK",
+                data: match
         )
         render responseBody as JSON
     }
