@@ -99,7 +99,6 @@ class BetController {
                 render responseBody as JSON
             }
         }
-
     }
 
     def getUserBetStatistics() {
